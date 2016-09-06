@@ -1,0 +1,35 @@
+dependencies {
+    compile project(":logtrace-spring-boot-autoconfigure")
+    compile('org.springframework.boot:spring-boot-starter')
+}
+
+uploadArchives {
+    repositories {
+       mavenDeployer{
+       	repository(url: "http://192.168.102.206:8900/nexus/content/repositories/releases"){
+       		authentication(userName: "admin", password:"admin123")
+       	}
+       	snapshotRepository(
+        url: "http://192.168.102.206:8900/nexus/content/repositories/snapshots") {
+          authentication(userName: "admin", password:"admin123")
+      }
+       	pom.project {
+        	groupId 'com.hzcard.spring.boot'
+        	artifactId 'logtrace-spring-boot-starter'
+        	packaging 'jar'
+         }
+       }
+    }
+}
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+task wrapper( type: Wrapper, description: "create a gradlew" ) {
+    gradleVersion = '2.0'
+}

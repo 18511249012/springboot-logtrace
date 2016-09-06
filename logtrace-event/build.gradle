@@ -1,0 +1,35 @@
+apply plugin: 'nebula.optional-base'
+dependencies {
+	compile 'com.netflix.hystrix:hystrix-core:1.5.2'
+	compile 'javax.servlet:javax.servlet-api', optional
+}
+uploadArchives {
+    repositories {
+       mavenDeployer{
+       	repository(url: "http://192.168.102.206:8900/nexus/content/repositories/releases"){
+       		authentication(userName: "admin", password:"admin123")
+       	}
+       	snapshotRepository(
+        url: "http://192.168.102.206:8900/nexus/content/repositories/snapshots") {
+          authentication(userName: "admin", password:"admin123")
+      }
+       	pom.project {
+        	groupId 'com.hzcard.spring.boot'
+        	artifactId 'logtrace-event'
+        	packaging 'jar'
+         }
+       }
+    }
+}
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+task wrapper( type: Wrapper, description: "create a gradlew" ) {
+    gradleVersion = '2.0'
+}

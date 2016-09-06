@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+         maven {url "http://192.168.102.206:8900/nexus/content/groups/hzcard/"}
+        //jcenter()
+        //maven { url "http://repo.spring.io/snapshot" }
+        //maven { url "http://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.1.0'
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.6.RELEASE"
+    }
+}
+
+allprojects {  
+    apply plugin: 'java' 
+    apply plugin: 'eclipse'
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    group = 'com.hzcard.spring.boot'
+    version = '2.0.7.RELEASE'
+    sourceCompatibility = 1.8  
+    targetCompatibility = 1.8 
+    
+    dependencyManagement {
+     	imports {
+		   mavenBom 'org.springframework.boot:spring-boot-starter-parent:1.3.5.RELEASE'
+		   mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Brixton.RC2'
+     	}
+    }
+
+    repositories {
+     maven {url "http://192.168.102.206:8900/nexus/content/groups/hzcard/"}
+    //jcenter()
+    //maven { url "http://repo.spring.io/snapshot" }
+    //maven { url "http://repo.spring.io/milestone" }
+    }
+} 
+subprojects { 
+	dependencies {
+		testCompile("org.springframework.boot:spring-boot-starter-test")
+	}
+	tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+}
+task wrapper( type: Wrapper, description: "create a gradlew" ) {
+    gradleVersion = '2.0'
+}

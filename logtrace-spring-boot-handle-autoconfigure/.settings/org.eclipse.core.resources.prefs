@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+encoding//src/main/java/com/hzcard/logtrace/spring/boot/handle/filter/AaHystrixRequestContextFilter.java=UTF-8
+encoding//src/main/java/com/hzcard/logtrace/spring/boot/handle/interceptor/EventHandlerInterceptor.java=UTF-8

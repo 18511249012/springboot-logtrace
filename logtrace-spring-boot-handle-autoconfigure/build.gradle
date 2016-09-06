@@ -1,0 +1,42 @@
+apply plugin: 'nebula.optional-base'
+dependencies {
+    compile project(":logtrace-event")
+    compile('org.springframework.boot:spring-boot-autoconfigure')
+    compile 'org.springframework.boot:spring-boot-configuration-processor', optional
+    compile 'org.springframework:spring-webmvc', optional
+    compile 'javax.servlet:javax.servlet-api', optional
+    compile('org.springframework.boot:spring-boot-starter-log4j2')
+    compile 'org.springframework:spring-context:4.2.6.RELEASE', optional
+    compile 'org.springframework.cloud:spring-cloud-starter-hystrix', optional
+}
+
+uploadArchives {
+    repositories {
+       mavenDeployer{
+       	repository(url: "http://192.168.102.206:8900/nexus/content/repositories/releases"){
+       		authentication(userName: "admin", password:"admin123")
+       	}
+       	snapshotRepository(
+        url: "http://192.168.102.206:8900/nexus/content/repositories/snapshots") {
+          authentication(userName: "admin", password:"admin123")
+      }
+       	pom.project {
+        	groupId 'com.hzcard.spring.boot'
+        	artifactId 'logtrace-spring-boot-handle-autoconfigure'
+        	packaging 'jar'
+         }
+       }
+    }
+}
+task wrapper( type: Wrapper, description: "create a gradlew" ) {
+    gradleVersion = '2.0'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
