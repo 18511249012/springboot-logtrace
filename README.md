@@ -48,7 +48,7 @@ public EventTypeResolver defaultEventTypeResolver(){
 ```java
 @Override
 public void addInterceptors(InterceptorRegistry registry) {
-    	registry.addInterceptor(new IPhoneEquipMentInterceptor(this.context));  //继承了EventHandlerInterceptor的类*
+    	registry.addInterceptor(new IPhoneEquipMentInterceptor(this.context));  //继承了EventHandlerInterceptor的类
 }
 ```
 ##获得客户访问设备类型##
