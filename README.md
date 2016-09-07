@@ -26,9 +26,9 @@ logtrace.kafkaProperty.bootstrapServers.name = bootstrap.servers&nbsp;&nbsp;*#ka
 logtrace.kafkaProperty.bootstrapServers.value=${kafka.brokers:191.162.102.208:9092}&nbsp;&nbsp;*#kafka的属性配置属性值，跟上一条bootstrapServers.name配置组成 name=value的属性，跟上一条bootstrapServers可以随便定义，只要最终name=value给kafka配置就可以*
 logtrace.kafkaProperty.maxrequestsize.name=max.request.size &nbsp;&nbsp; *#同上解释*
 logtrace.kafkaProperty.maxrequestsize.value=2097152&nbsp;&nbsp;      *#同上解释*
-** **
+***
 ...      &nbsp;&nbsp;*#kafka其他属性值配置*
-** **
+***
 logtrace.patter = %d %-5p [%t] %C{2} (%F:%L) - %m%n&nbsp;&nbsp;     *#使用的日志输出模式*</code></pre>
 ##事件解析添加##
 &#8195;编写一个类实现<code>com.hzcard.logtrace.event.EventTypeResolver</code>类，实现eventGen方法，自己定义把请求解析成事件。
