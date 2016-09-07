@@ -13,9 +13,9 @@
 </dependency>
 
 <!--可选依赖-->
-<dependency&gt;
-	<groupId&gt;com.netflix.feign</groupId>
-	<artifactId&gt;feign-okhttp</artifactId>
+<dependency>
+	<groupId>com.netflix.feign</groupId>
+	<artifactId>feign-okhttp</artifactId>
 </dependency>
 ```
 ##配置##
