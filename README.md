@@ -20,15 +20,22 @@
 ##配置##
 &#8195;在spring boot规定的配置文件中添加配置，配置中可以指定日志格式、日志输出方式（支持kafka和file）、日志输出路径、是否使用okHttp，如果不添加配置，则日志默认输出到文件/var/log/hzcard目录下。以下以application.properties为配置文件样例
 <code>
-feign.httpclient.enabled=false	&nbsp;&nbsp;&nbsp;&nbsp;	*#使用okHttp调用服务*<br />
-logtrace.appenderType=KAFKA &nbsp;&nbsp;&nbsp;&nbsp;           *#使用KAFKA/FILE输出*<br />
-logtrace.kafkaTopic=eventpropertiestopic   &nbsp;&nbsp;&nbsp;&nbsp; *#kafka输出使用的topic*<br />
-logtrace.kafkaProperty.bootstrapServers.name = bootstrap.servers   *#kafka的属性配置属性名*<br />
-logtrace.kafkaProperty.bootstrapServers.value=${kafka.brokers:191.162.102.208:9092} <br />&nbsp;&nbsp;&nbsp;&nbsp;*#kafka的属性配置属性值，跟上一条bootstrapServers.name配置组成 name=value的属性，跟上一条bootstrapServers可以随便定义，只要最终name=value给kafka配置就可以*<br />
-logtrace.kafkaProperty.maxrequestsize.name=max.request.size  *#同上解释*<br />
-logtrace.kafkaProperty.maxrequestsize.value=2097152   &nbsp;&nbsp;&nbsp;&nbsp;      *#同上解释*<br />
+feign.httpclient.enabled=false
+&nbsp;&nbsp;&nbsp;&nbsp;	*#使用okHttp调用服务*
+logtrace.appenderType=KAFKA
+&nbsp;&nbsp;&nbsp;&nbsp;           *#使用KAFKA/FILE输出*
+logtrace.kafkaTopic=eventpropertiestopic
+&nbsp;&nbsp;&nbsp;&nbsp; *#kafka输出使用的topic*
+logtrace.kafkaProperty.bootstrapServers.name = bootstrap.servers
+&nbsp;&nbsp;&nbsp;&nbsp;*#kafka的属性配置属性名*<br />
+logtrace.kafkaProperty.bootstrapServers.value=${kafka.brokers:191.162.102.208:9092}
+&nbsp;&nbsp;&nbsp;&nbsp;*#kafka的属性配置属性值，跟上一条bootstrapServers.name配置组成 name=value的属性，跟上一条bootstrapServers可以随便定义，只要最终name=value给kafka配置就可以*
+logtrace.kafkaProperty.maxrequestsize.name=max.request.size  *#同上解释*
+logtrace.kafkaProperty.maxrequestsize.value=2097152
+&nbsp;&nbsp;&nbsp;&nbsp;      *#同上解释*<br />
 ...
-logtrace.patter = %d %-5p [%t] %C{2} (%F:%L) - %m%n    &nbsp;&nbsp;&nbsp;&nbsp;     *#使用的日志输出模式*<br />
+logtrace.patter = %d %-5p [%t] %C{2} (%F:%L) - %m%n
+&nbsp;&nbsp;&nbsp;&nbsp;     *#使用的日志输出模式*<br />
 </code>
 
 ##事件解析添加##
