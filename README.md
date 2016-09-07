@@ -30,6 +30,7 @@ logtrace.kafkaProperty.maxrequestsize.name=max.request.size       #同上解释
 logtrace.kafkaProperty.maxrequestsize.value=2097152               #同上解释
 ...                                                               #kafka其他属性值配置
 logtrace.patter = %d %-5p [%t] %C{2} (%F:%L) - %m%n               #使用的日志输出模式
+logtrace.logFile = /var/log/hzcard/feiginClient.log               #配置输出文件及路径
 ```
 ##事件解析添加##
 &#8195;编写一个类实现<code>com.hzcard.logtrace.event.EventTypeResolver</code>类，实现eventGen方法，自己定义把请求解析成事件。
