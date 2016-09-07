@@ -42,12 +42,13 @@ logtrace.patter = %d %-5p [%t] %C{2} (%F:%L) - %m%n&nbsp;&nbsp;     *#使用的�
 &#8195;logtrace默认会解析请求的设备，包括：iphone、ipad、mac、windows、linux、android，详细见<code>com.hzcard.logtrace.spring.boot.handle.interceptor.EquipmentTypeEnum</code>
 
 &#8195;如果默认的请求无法辨认客户端设备类型，可以进行扩展。
-&#8195;创建一个继承<code>com.hzcard.logtrace.spring.boot.handle.interceptor.EventHandlerInterceptor</code>的类，实现<code>EquipmentTypeEnum resolve(HttpServletRequest request)</code>方法。根据spring boot的mvc配置扩展规范，在自己工程目录下创建一个继承了<code>org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</code>的类，覆写方法<code>
+&#8195;创建一个继承<code>com.hzcard.logtrace.spring.boot.handle.interceptor.EventHandlerInterceptor</code>的类，实现<code>EquipmentTypeEnum resolve(HttpServletRequest request)</code>方法。根据spring boot的mvc配置扩展规范，在自己工程目录下创建一个继承了<code>org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</code>的类，覆写方法
+'''java
     @Override
 	public void addInterceptors(InterceptorRegistry registry) {
     &nbsp;&nbsp;&nbsp;&nbsp;registry.addInterceptor(new IPhoneEquipMentInterceptor(this.context));       *//继承了EventHandlerInterceptor的类*
-    }
-</code>
+}
+'''
 ##获得客户访问设备类型##
 &#8195;默认提供了工具类<code>com.hzcard.logtrace.spring.util.ClientTypeTools</code>，调用其方法<code>getClientType()</code>，获得设备默认对应的类型。
 ##日志输出与服务调用轨迹##
