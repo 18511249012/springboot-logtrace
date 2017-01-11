@@ -38,7 +38,6 @@ public abstract class EventHandlerInterceptor implements HandlerInterceptor, Log
 
 	public abstract EquipmentTypeEnum resolve(HttpServletRequest request);
 
-	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
@@ -66,10 +65,10 @@ public abstract class EventHandlerInterceptor implements HandlerInterceptor, Log
 				return true;
 			}
 			if (platform != null && platform.trim().length() > 0)
-				platform = eqType.toString() + SPLITOSANDPLATFORM + platform;  //各平台会设置platform
-			else	//默认是cms
+				platform = eqType.toString() + SPLITOSANDPLATFORM + platform; // 各平台会设置platform
+			else // 默认是cms
 				platform = eqType.toString() + "-" + IEventConstant.WEB_SITE_PLATFORM;
-			
+
 			eventResolver = applicationContext.getBean(EventTypeResolver.class);
 			String eventType = eventResolver.eventGen(request);
 			String eventCode = "";
@@ -93,17 +92,18 @@ public abstract class EventHandlerInterceptor implements HandlerInterceptor, Log
 					logger.error("操作流水号获取失败！", th);
 				}
 			}
-			ievent = new EventIimmutable(platform, eventType, UUID.randomUUID().toString(), eventCode, "1");
+			ievent = new EventIimmutable(platform, eventType, UUID.randomUUID().toString().replace("-", ""), eventCode, "1");
 			Map<EventIimmutable, Integer> eventMap = new HashMap<EventIimmutable, Integer>();
 			eventMap.put(ievent, null);
 			requestV.set(eventMap);
 		}
-		if (platform != null)
+		if (!response.containsHeader(IEventConstant.X_EVENT_ID)) {
+			response.setHeader(IEventConstant.X_EVENT_ID, ievent.getEventId());
 			response.setHeader(IEventConstant.X_EVENT_PLATFORM, platform);
-		response.setHeader(IEventConstant.X_EVENT_TYPE, ievent.getEventType());
-		response.setHeader(IEventConstant.X_EVENT_ID, ievent.getEventId());
-		response.setHeader(IEventConstant.X_EVENT_CODE, ievent.getEventCode());
-		response.addHeader(IEventConstant.X_EVENT_SEQUENCE, ievent.getEventSequence());
+			response.setHeader(IEventConstant.X_EVENT_TYPE, ievent.getEventType());
+			response.setHeader(IEventConstant.X_EVENT_CODE, ievent.getEventCode());
+			response.setHeader(IEventConstant.X_EVENT_SEQUENCE, ievent.getEventSequence());
+		}
 		return true;
 	}
 

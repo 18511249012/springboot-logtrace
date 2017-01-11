@@ -18,8 +18,21 @@ public class LogTraceProperties {
 	private String kafkaTopic;
 	
 	private String patter;
+	
+	/**
+	 * 是否同步
+	 */
+	private boolean isSyn;
 
 	
+
+	public boolean isSyn() {
+		return isSyn;
+	}
+
+	public void setSyn(boolean isSyn) {
+		this.isSyn = isSyn;
+	}
 
 	public String getPatter() {
 		return patter;

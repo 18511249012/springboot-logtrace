@@ -4,9 +4,10 @@ dependencies {
     compile project(":logtrace-event")
     compile('org.springframework.boot:spring-boot-autoconfigure')
     compile 'org.springframework.boot:spring-boot-configuration-processor', optional
+   compile 'org.apache.kafka:kafka-clients:0.9.0.0',optional
     compile 'javax.servlet:javax.servlet-api', optional
     compile 'org.springframework:spring-webmvc', optional
-    compile 'com.netflix.feign:feign-core:8.16.0'
+    compile group: 'io.github.openfeign', name: 'feign-okhttp', version: '9.3.1'
     compile('org.springframework.boot:spring-boot-starter-log4j2')
     compile 'org.springframework:spring-context:4.2.6.RELEASE', optional
     compile 'org.springframework.cloud:spring-cloud-starter-hystrix', optional

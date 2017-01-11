@@ -38,6 +38,7 @@ logtrace.kafkaProperty.maxrequestsize.name=max.request.size       #同上解释
 logtrace.kafkaProperty.maxrequestsize.value=2097152               #同上解释
 ...                                                               #kafka其他属性值配置
 logtrace.patter = %d %-5p [%t] %C{2} (%F:%L) - %m%n               #使用的日志输出模式
+logtrace.logFile = /var/log/hzcard/feiginClient.log               #配置输出文件及路径
 </code></pre>">feign.httpclient.enabled=false                                    #使用okHttp调用服务
 logtrace.appenderType=KAFKA                                       #使用KAFKA/FILE输出
 logtrace.kafkaTopic=eventpropertiestopic                          #kafka输出使用的topic
@@ -47,6 +48,7 @@ logtrace.kafkaProperty.maxrequestsize.name=max.request.size       #同上解释
 logtrace.kafkaProperty.maxrequestsize.value=2097152               #同上解释
 ...                                                               #kafka其他属性值配置
 logtrace.patter = %d %-5p [%t] %C{2} (%F:%L) - %m%n               #使用的日志输出模式
+logtrace.logFile = /var/log/hzcard/feiginClient.log               #配置输出文件及路径
 </code></pre><h2 id="事件解析添加"><a name="事件解析添加" href="#事件解析添加"></a>事件解析添加</h2><p> 编写一个类实现<code>com.hzcard.logtrace.event.EventTypeResolver</code>类，实现eventGen方法，自己定义把请求解析成事件。<br>根据spring boot的规范，在启动类中注入一个bean</p><pre class="java hljs"><code class="java" data-origin="<pre><code class=&quot;java&quot;>@Bean
 public EventTypeResolver defaultEventTypeResolver(){
     return new EventResolverDefault();    //自定义创建的类

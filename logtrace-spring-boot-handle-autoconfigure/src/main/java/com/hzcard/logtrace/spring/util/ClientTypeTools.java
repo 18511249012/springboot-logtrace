@@ -15,8 +15,7 @@ import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariableDefault;
 public class ClientTypeTools implements LogConstant{
 	private static final Logger logger = LoggerFactory.getLogger(ClientTypeTools.class);
 	
-	public static Integer getClientType(){
-		
+	public static EquipmentTypeEnum getClientEquipmentTypeEnum(){
 		HystrixRequestVariableDefault<Map<EventIimmutable, Integer>> requestVariable = RequestVariablHolder
 				.getInstance();
 		Map<EventIimmutable, Integer> event = null;
@@ -26,20 +25,27 @@ public class ClientTypeTools implements LogConstant{
 			// logger.error("RequestInterceptor exception ",e);
 		}
 		if(event==null)
-			return null;
+			return EquipmentTypeEnum.NOTIDENTITY;
 		if (event != null && event.size() > 0) {
 			Set<EventIimmutable> rEvents = event.keySet();
 			for (EventIimmutable rEvent : rEvents) {
 				String eventPlatform = rEvent.getEventPlatform();
 				try{
 				EquipmentTypeEnum typeEnum = EquipmentTypeEnum.valueOf(eventPlatform.split(SPLITOSANDPLATFORM)[0]);
-				return typeEnum.getClientType();
+				return typeEnum;
 				}catch(Throwable th){
 					logger.error(th.getMessage());
 				}
 			}
 		}
-		return null;
+		return EquipmentTypeEnum.NOTIDENTITY;
+	}
+	
+	public static Integer getClientType(){
+		EquipmentTypeEnum eTe = getClientEquipmentTypeEnum();
+		if(eTe==null)
+			return null;
+		return eTe.getClientType();
 	}
 
 }

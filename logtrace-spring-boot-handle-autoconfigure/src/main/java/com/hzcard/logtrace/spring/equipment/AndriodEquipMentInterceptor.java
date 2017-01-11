@@ -20,15 +20,15 @@ public class AndriodEquipMentInterceptor extends EventHandlerInterceptor {
 				|| userAgent.indexOf(")") < 0)
 			return EquipmentTypeEnum.NOTIDENTITY;
 
-		String osPlatform = userAgent.substring(userAgent.indexOf("(") + 1, userAgent.indexOf(")")).split(";")[0];
-		if (!osPlatform.startsWith("Java") && !osPlatform.startsWith("Android"))
+		String osPlatform = userAgent.substring(userAgent.indexOf("(") + 1, userAgent.indexOf(")"));
+		if (osPlatform.indexOf("Android") >= 0) {
+			if (userAgent.startsWith("Apache-HttpClient")) // 安卓原生
+				return EquipmentTypeEnum.ANROIDNATIVE;
+			else if (userAgent.startsWith("Mozilla"))
+				return EquipmentTypeEnum.ANDROIDWEB;
 			return EquipmentTypeEnum.NOTIDENTITY;
-		if (userAgent.startsWith("Apache-HttpClient")) // 安卓原生
-			return EquipmentTypeEnum.ANROIDNATIVE;
-		else if(userAgent.startsWith("Mozilla"))
-			return EquipmentTypeEnum.ANDROIDWEB;
-		return EquipmentTypeEnum.NOTIDENTITY;
-
+		} else
+			return EquipmentTypeEnum.NOTIDENTITY;
 	}
 
 }

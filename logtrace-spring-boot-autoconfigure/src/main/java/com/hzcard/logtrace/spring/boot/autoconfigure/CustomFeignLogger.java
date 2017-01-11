@@ -8,20 +8,22 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender;
 import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
+import com.hzcard.logtrace.HzcardKafkaAppender;
 import com.hzcard.logtrace.event.EventIimmutable;
 import com.hzcard.logtrace.event.IEventConstant;
 import com.hzcard.logtrace.event.RequestVariablHolder;
@@ -35,53 +37,63 @@ public class CustomFeignLogger extends feign.Logger {
 
 	private final Logger logger;
 
+	private static final String DEFAULT_PATTERN = "%d [%t] %X{requestResponseKey} - %m%n";
+
 	public CustomFeignLogger(Class<?> clazz) {
 		this(clazz.getName(), null);
 	}
 
 	public CustomFeignLogger(String name, LogTraceProperties properties) {
 		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-		// ctx.getLogger(name);
 		final Configuration config = ctx.getConfiguration();
-		Layout<?> layout = null;
-		Appender appender = null;
-		if (properties == null) {
-			layout = PatternLayout.createLayout(PatternLayout.SIMPLE_CONVERSION_PATTERN, null, config, null,
-					Charset.forName("UTF-8"), true, false, null, null);
-			appender = FileAppender.createAppender(
-					File.separator + "var" + File.separator + "log" + File.separator + "hzcard" + File.separator
-							+ "feignClient.log",
-					null, null, name, null, null, "true", "16384", layout, null, null, null, config);
-		} else {
-			layout = PatternLayout.createLayout(
-					properties.getPatter() == null ? PatternLayout.SIMPLE_CONVERSION_PATTERN : properties.getPatter(),
-					null, config, null, Charset.forName("UTF-8"), true, false, null, null);
-			if (properties.getAppenderType() == null || properties.getAppenderType().equals(AppenderEnum.FILE)) {
-				appender = FileAppender.createAppender(
-						properties.getLogFile() == null ? (File.separator + "var" + File.separator + "log"
-								+ File.separator + "hzcard" + File.separator + "feignClient.log")
-								: properties.getLogFile(),
-						null, null, name, null, null, "true", "16384", layout, null, null, null, config);
-			} else if (properties.getAppenderType().equals(AppenderEnum.KAFKA)) {
-				if (properties.getKafkaProperty() != null) {
-					Property[] kafkaProperties = new Property[properties.getKafkaProperty().size()];
-					int i = 0;
-					for (LogTraceProperty sProperty : properties.getKafkaProperty().values()) {
-						kafkaProperties[i] = Property.createProperty(sProperty.getName(), sProperty.getValue());
-						i++;
-					}
-					appender = KafkaAppender.createAppender(layout, null, name, true, properties.getKafkaTopic(),
-							kafkaProperties);
-				}
+		AppenderRef[] refs = null;
+		Layout<?> layout = PatternLayout.createLayout(
+				(properties == null || properties.getPatter() == null) ? DEFAULT_PATTERN : properties.getPatter(), null,
+				config, null, Charset.forName("UTF-8"), true, false, null, null);
+
+		Appender fileAppender = FileAppender.createAppender(
+				(properties == null || properties.getLogFile() == null) ? (File.separator + "var" + File.separator
+						+ "log" + File.separator + "hzcard" + File.separator + "feignClient.log")
+						: properties.getLogFile(),
+				null, null, name + AppenderEnum.FILE, null, null, "true", "16384", layout, null, null, null, config);
+		fileAppender.start();
+		config.addAppender(fileAppender);
+		Appender kafkaAppender = null;
+		if (properties.getKafkaProperty() != null) {
+			Property[] kafkaProperties = new Property[properties.getKafkaProperty().size()];
+			int i = 0;
+			for (LogTraceProperty sProperty : properties.getKafkaProperty().values()) {
+				kafkaProperties[i] = Property.createProperty(sProperty.getName(), sProperty.getValue());
+				i++;
 			}
+			kafkaAppender = HzcardKafkaAppender.createAppender(layout, null, name + AppenderEnum.KAFKA.toString(), true,
+					properties.getKafkaTopic(), kafkaProperties);
+			kafkaAppender.start();
+			config.addAppender(kafkaAppender);
 		}
-		appender.start();
-		config.addAppender(appender);
-		AppenderRef ref = AppenderRef.createAppenderRef(name, null, null);
-		AppenderRef[] refs = new AppenderRef[] { ref };
-		LoggerConfig loggerConfig = LoggerConfig.createLogger("false", org.apache.logging.log4j.Level.DEBUG, name,
-				"true", refs, null, config, null);
-		loggerConfig.addAppender(appender, org.apache.logging.log4j.Level.DEBUG, null);
+		LoggerConfig loggerConfig = null;
+		if (properties.getAppenderType() == null) {
+			refs = new AppenderRef[] { AppenderRef.createAppenderRef(name + AppenderEnum.FILE.toString(), null, null) };
+			loggerConfig = LoggerConfig.createLogger(false, org.apache.logging.log4j.Level.DEBUG, name,
+					String.valueOf(properties.isSyn()), refs, null, config, null);
+			loggerConfig.addAppender(fileAppender, org.apache.logging.log4j.Level.DEBUG, null);
+		} else if (properties.getAppenderType().equals(AppenderEnum.ALL)) {
+			refs = new AppenderRef[] { AppenderRef.createAppenderRef(name + "FILE", null, null),
+					AppenderRef.createAppenderRef(name + "KAFKA", null, null) };
+			loggerConfig = LoggerConfig.createLogger(false, org.apache.logging.log4j.Level.DEBUG, name,
+					String.valueOf(properties.isSyn()), refs, null, config, null);
+			loggerConfig.addAppender(fileAppender, org.apache.logging.log4j.Level.DEBUG, null);
+			loggerConfig.addAppender(kafkaAppender, org.apache.logging.log4j.Level.DEBUG, null);
+		} else {
+			refs = new AppenderRef[] {
+					AppenderRef.createAppenderRef(name + properties.getAppenderType().toString(), null, null) };
+			loggerConfig = LoggerConfig.createLogger(false, org.apache.logging.log4j.Level.DEBUG, name,
+					String.valueOf(properties.isSyn()), refs, null, config, null);
+			if (properties.getAppenderType().equals(AppenderEnum.KAFKA))
+				loggerConfig.addAppender(kafkaAppender, org.apache.logging.log4j.Level.DEBUG, null);
+			else
+				loggerConfig.addAppender(fileAppender, org.apache.logging.log4j.Level.DEBUG, null);
+		}
 		config.addLogger(name, loggerConfig);
 		ctx.updateLoggers(config);
 		this.logger = ctx.getLogger(name);
@@ -89,14 +101,22 @@ public class CustomFeignLogger extends feign.Logger {
 
 	@Override
 	protected void log(String configKey, String format, Object... args) {
-		logger.debug(String.format(methodTag(configKey) + format, args));
+		try {
+			logger.debug(String.format(methodTag(configKey) + format, args));
+		} catch (Throwable th) {
+			th.printStackTrace();
+			System.out.println(th.getMessage());
+		}
 
 	}
 
 	@Override
 	protected void logRequest(String configKey, Level logLevel, Request request) {
 		if (logger.isDebugEnabled()) {
+			String requestResponseKey = UUID.randomUUID().toString().replace("-", "");
+			ThreadContext.put("requestResponseKey", requestResponseKey);
 			super.logRequest(configKey, logLevel, request);
+			ThreadContext.pop();
 		}
 	}
 
@@ -135,15 +155,14 @@ public class CustomFeignLogger extends feign.Logger {
 							headers.put(IEventConstant.X_EVENT_CODE, Arrays.asList(rEvent.getEventCode()));
 						if (rEvent.getEventSequence() != null)
 							headers.put(IEventConstant.X_EVENT_SEQUENCE,
-									Arrays.asList(rEvent.getEventSequence()+"-"+ievent.get(rEvent)));
+									Arrays.asList(rEvent.getEventSequence() + "-" + ievent.get(rEvent)));
 						break;
 					}
 				}
-
 			}
-
-			return super.logAndRebufferResponse(configKey, logLevel,
-					Response.create(response.status(), response.reason(), headers, response.body()), elapsedTime);
+			response = Response.builder().body(response.body()).status(response.status()).headers(headers)
+					.reason(response.reason()).build();
+			return super.logAndRebufferResponse(configKey, logLevel, response, elapsedTime);
 		}
 		return response;
 	}
